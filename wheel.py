@@ -10,7 +10,7 @@ class Wheel:
         # Basic Kinematics
         self.position = np.array((0, 0, 0))
         self.velocity = np.array((0, 0, 0))
-        self.heading = 0
+        self.rotation = 0
         self.mass = mass
 
         # Suspension
@@ -29,7 +29,7 @@ class Wheel:
         return np.array(0, 0, vertical_force)
     
     def get_steering_force(self, delta_time):
-        steering_direction = np.array(math.cos(self.heading), math.sin(self.heading))
+        steering_direction = np.array(math.cos(self.rotation), math.sin(self.rotation))
         steering_velocity = np.dot(self.car.velocity + self.velocity, steering_direction)
         
         if steering_velocity == 0:
@@ -42,7 +42,7 @@ class Wheel:
         if self.power == 0:
             return np.empty()
 
-        driving_direction = np.array(math.cos(self.heading + math.pi / 2), math.sin(self.heading + math.pi / 2))
+        driving_direction = np.array(math.cos(self.rotation + math.pi / 2), math.sin(self.rotation + math.pi / 2))
         driving_velocity_percent = clamp(abs(np.dot(self.car.velocity, driving_direction) / self.car.max_speed), 0, 1)
         return driving_direction * self.drive_function(driving_velocity_percent) * self.power
 
