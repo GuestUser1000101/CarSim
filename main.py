@@ -33,3 +33,4 @@ while True:
         )
     )
     world.update_world_graphics(DISPLAY)
+    print(world.car.velocity)

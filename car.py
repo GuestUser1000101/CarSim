@@ -23,18 +23,18 @@ class Car:
         self.driving_wheels = driving_wheels
         self.steering_wheels = steering_wheels
         self.wheels = [
-            Wheel(self, np.array([-self.width / 2, self.length / 2, -0.5]), 10, 100, 10),
-            Wheel(self, np.array([self.width / 2, self.length / 2, -0.5]), 10, 100, 10),
-            Wheel(self, np.array([-self.width / 2, -self.length / 2, -0.5]), 10, 100, 10),
-            Wheel(self, np.array([self.width / 2, -self.length / 2, -0.5]), 10, 100, 10)
+            Wheel(self, np.array([-self.width / 2, self.length / 2, -0.5]), 100, 100, 10),
+            Wheel(self, np.array([self.width / 2, self.length / 2, -0.5]), 100, 100, 10),
+            Wheel(self, np.array([-self.width / 2, -self.length / 2, -0.5]), 100, 100, 10),
+            Wheel(self, np.array([self.width / 2, -self.length / 2, -0.5]), 100, 100, 10)
         ]
 
         # fowards, left, right, backward
         self.inputs = [False, False, False, False]
         self.steering_angle = 0
         self.steering_angle_velocity = 0
-        self.steering_angle_speed = 2
-        self.steering_angle_dampen = 1
+        self.steering_angle_speed = 0.5
+        self.steering_angle_dampen = 4
 
     def apply_force_at_position(self, force, position, delta_time):
         self.apply_force(force, delta_time)
@@ -45,7 +45,8 @@ class Car:
         self.velocity += rotate_vector(force / self.mass * delta_time, self.rotation)
 
     def update_physics(self, delta_time):
-        self.velocity += np.array([0, 0, -1]) * self.world.gravity * self.mass * delta_time
+        #self.velocity += np.array([0, 0, -1]) * self.world.gravity * delta_time
+        set_z(self.position, 0)
 
         forward_input, left_input, right_input, backward_input = [self.inputs[i] for i in range(4)]
 
@@ -58,7 +59,8 @@ class Car:
         else:
             self.steering_angle_velocity = -self.steering_angle * self.steering_angle_dampen
 
-        self.steering_angle += self.steering_angle_velocity * delta_time       
+        self.steering_angle += self.steering_angle_velocity * delta_time
+        self.steering_angle = clamp(self.steering_angle, -math.pi / 4, math.pi / 4)
 
         if self.steering_angle != 0:
             turn_radius = self.length / math.tan(self.steering_angle)
