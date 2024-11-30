@@ -33,7 +33,7 @@ class Car:
         self.inputs = [False, False, False, False]
         self.steering_angle = 0
         self.steering_angle_velocity = 0
-        self.steering_angle_speed = 10
+        self.steering_angle_speed = 2
         self.steering_angle_dampen = 1
 
     def apply_force_at_position(self, force, position, delta_time):
@@ -42,7 +42,7 @@ class Car:
         self.rotational_velocity += torque / self.rotational_inertia * delta_time
 
     def apply_force(self, force, delta_time):
-        self.velocity += force / self.mass * delta_time
+        self.velocity += rotate_vector(force / self.mass * delta_time, self.rotation)
 
     def update_physics(self, delta_time):
         self.velocity += np.array([0, 0, -1]) * self.world.gravity * self.mass * delta_time
@@ -52,9 +52,9 @@ class Car:
         if left_input and right_input:
             self.steering_angle_velocity = 0
         elif left_input:
-            self.steering_angle_velocity = -self.steering_angle_speed * 2 if self.steering_angle > 0 else 1
+            self.steering_angle_velocity = -self.steering_angle_speed * (2 if self.steering_angle > 0 else 1)
         elif right_input:
-            self.steering_angle_velocity = self.steering_angle_speed * 2 if self.steering_angle < 0 else 1
+            self.steering_angle_velocity = self.steering_angle_speed * (2 if self.steering_angle < 0 else 1)
         else:
             self.steering_angle_velocity = -self.steering_angle * self.steering_angle_dampen
 
@@ -76,7 +76,9 @@ class Car:
         self.position += self.velocity * delta_time
     
     def draw(self, screen):
-        draw_rect(screen, (255, 255, 0), self.position, self.length, self.width, self.rotation, self.world.pixels_per_meter)
+        draw_rect(screen, (255, 0, 0), self.position, self.length, self.width, self.rotation, self.world.pixels_per_meter)
+        for wheel in self.wheels:
+            draw_rect(screen, (0, 255, 255), self.position + rotate_vector(wheel.position, self.rotation), 1, 0.4, self.rotation + wheel.rotation, self.world.pixels_per_meter)
     
     def draw_steering(self, screen, screen_x, screen_y):
         draw_rect(screen, (255, 255, 255), np.array([screen_x, screen_y]), 60, 75, self.steering_angle)

@@ -35,3 +35,6 @@ def get_signed_angle_between(vector1, vector2):
 
 def get_unit(vector):
     return vector / np.linalg.norm(vector)
+
+def rotate_vector(vector, angle):
+    return np.dot(vector, np.array([[math.cos(angle), -math.sin(angle), 0], [math.sin(angle),  math.cos(angle), 0], [0, 0, 1]]))

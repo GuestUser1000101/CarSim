@@ -44,7 +44,7 @@ class Wheel:
             return np.empty(3)
 
         driving_direction = np.array([math.cos(self.rotation + math.pi / 2), math.sin(self.rotation + math.pi / 2), 0])
-        driving_velocity_percent = clamp(abs(np.dot(self.car.velocity, driving_direction) / self.car.max_speed), 0, 1)
+        driving_velocity_percent = clamp(abs(np.dot(rotate_vector(self.car.velocity, -self.car.rotation), driving_direction) / self.car.max_speed), 0, 1)
         return driving_direction * self.drive_function(driving_velocity_percent) * self.power
 
     def default_traction_function(self, percent_steering_velocity):
