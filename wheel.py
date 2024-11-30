@@ -19,6 +19,7 @@ class Wheel:
 
         # Traction
         self.traction_function = self.default_traction_function if traction_function == None else traction_function
+        self.wheel_friction = 50
 
         # Drive
         self.power = 0
@@ -30,14 +31,23 @@ class Wheel:
     
     def get_steering_force(self, delta_time):
         steering_direction = np.array([math.cos(self.rotation), math.sin(self.rotation), 0])
-        steering_velocity = np.dot(self.car.velocity + self.velocity, steering_direction)
+        steering_velocity = np.dot(
+            (
+                rotate_vector(
+                    self.car.rotational_velocity * self.position,
+                    -math.pi / 2
+                ) +
+                rotate_vector(self.car.velocity, -self.car.rotation) +
+                self.velocity
+            ),
+            steering_direction
+        )
         
         if steering_velocity == 0:
             return np.empty(3)
         
         traction = self.traction_function(abs(steering_velocity / np.linalg.norm(self.car.velocity + self.velocity)))
-        print(-steering_velocity)
-        return -steering_velocity * traction / delta_time * steering_direction
+        return -steering_velocity * traction / delta_time * steering_direction * self.wheel_friction
         
     def get_driving_force(self, deltaTime):
         if self.power == 0:

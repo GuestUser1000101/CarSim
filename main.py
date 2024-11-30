@@ -33,4 +33,3 @@ while True:
         )
     )
     world.update_world_graphics(DISPLAY)
-    #print([world.car.wheels[i].position for i in range(4)])
