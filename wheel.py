@@ -4,12 +4,12 @@ import math
 
 
 class Wheel:
-    def __init__(self, car, mass, spring_strength, damping_strength, traction_function = None, drive_function = None):
+    def __init__(self, car, position, mass, spring_strength, damping_strength, traction_function = None, drive_function = None):
         self.car = car
 
         # Basic Kinematics
-        self.position = np.array((0, 0, 0))
-        self.velocity = np.array((0, 0, 0))
+        self.position = position
+        self.velocity = np.array((0.0, 0.0, 0.0))
         self.rotation = 0
         self.mass = mass
 
@@ -18,40 +18,51 @@ class Wheel:
         self.damping_strength = damping_strength
 
         # Traction
-        self.traction_function = self.defaultTractionFunction if traction_function == None else traction_function
+        self.traction_function = self.default_traction_function if traction_function == None else traction_function
 
         # Drive
         self.power = 0
-        self.drive_function = self.defaultDrivingFunction if drive_function == None else drive_function
+        self.drive_function = self.default_driving_function if drive_function == None else drive_function
     
     def get_dampening_force(self, delta_time):
-        vertical_force =  -self.position * self.spring_strength - get_y(self.velocity) * self.damping_strength
-        return np.array(0, 0, vertical_force)
+        vertical_force =  -get_z(self.position) * self.spring_strength - get_z(self.velocity) * self.damping_strength
+        return np.array([0, 0, vertical_force])
     
     def get_steering_force(self, delta_time):
-        steering_direction = np.array(math.cos(self.rotation), math.sin(self.rotation))
+        steering_direction = np.array([math.cos(self.rotation), math.sin(self.rotation), 0])
         steering_velocity = np.dot(self.car.velocity + self.velocity, steering_direction)
         
         if steering_velocity == 0:
-            return np.empty()
+            return np.empty(3)
         
-        traction = self.traction_function(steering_velocity / np.linalg.norm(self.car.velocity + self.velocity))
+        traction = self.traction_function(abs(steering_velocity / np.linalg.norm(self.car.velocity + self.velocity)))
+        print(-steering_velocity)
         return -steering_velocity * traction / delta_time * steering_direction
         
     def get_driving_force(self, deltaTime):
         if self.power == 0:
-            return np.empty()
+            return np.empty(3)
 
-        driving_direction = np.array(math.cos(self.rotation + math.pi / 2), math.sin(self.rotation + math.pi / 2))
+        driving_direction = np.array([math.cos(self.rotation + math.pi / 2), math.sin(self.rotation + math.pi / 2), 0])
         driving_velocity_percent = clamp(abs(np.dot(self.car.velocity, driving_direction) / self.car.max_speed), 0, 1)
         return driving_direction * self.drive_function(driving_velocity_percent) * self.power
 
-    def defaultTractionFunction(percent_steering_velocity):
+    def default_traction_function(self, percent_steering_velocity):
         if percent_steering_velocity < 0 or percent_steering_velocity > 1:
             raise Exception("Argument must be between 0 and 1")
         return -0.5 * math.floor(2 * percent_steering_velocity) + 0.6
 
-    def defaultDrivingFunction(percent_driving_velocity):
+    def default_driving_function(self, percent_driving_velocity):
         if percent_driving_velocity < 0 or percent_driving_velocity > 1:
             raise Exception("Argument must be between 0 and 1")
         return 4 * math.cos(math.pow(percent_driving_velocity, 1.5) - 0.4) - 3
+
+    def apply_forces_to_car(self, delta_time):
+        net_force = -self.get_dampening_force(delta_time) + self.get_driving_force(delta_time) + self.get_steering_force(delta_time)
+        self.car.apply_force_at_position(net_force, self.position, delta_time)
+
+    def update_physics(self, delta_time):
+        self.position += self.velocity * delta_time
+
+    def is_on_ground(self):
+        return get_z(self.position) + get_z(self.car.position) <= self.car.world.ground

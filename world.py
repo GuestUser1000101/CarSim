@@ -1,21 +1,20 @@
 import pygame as pg
 import sys
+from car import *
 
+class World:
+    def __init__(self):
+        self.car = Car(self, 2, 4, 1000, 10000)
+        self.ground = 0
+        self.gravity = 9.81
+        self.pixels_per_meter = 10
 
-pg.__init__()
-FPS = 60
-clock = pg.time.Clock()
+    def update_world_physics(self, delta_time, inputs):
+        for i in range(4):
+            self.car.inputs[i] = inputs[i]
+        self.car.update_physics(delta_time)
 
-def physics(delta_time):
-    pass
-
-while True:
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            pg.quit()
-            sys.exit()
-
-    pg.display.update()
-    delta_time = clock.tick(FPS) >> 10
-
-    physics(delta_time)
+    def update_world_graphics(self, screen):
+        screen.fill((0, 0, 0))
+        self.car.draw(screen)
+        self.car.draw_steering(screen, 450, 450)

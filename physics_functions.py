@@ -11,6 +11,15 @@ def get_y(vector):
 def get_z(vector):
     return vector[2]
 
+def set_x(vector, value):
+    vector[0] = value
+
+def set_y(vector, value):
+    vector[1] = value
+
+def set_z(vector, value):
+    vector[2] = value
+
 def get_deadband(value, threshold, default = 0):
     return default if abs(value - default) < threshold else value
 
