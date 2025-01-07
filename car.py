@@ -62,14 +62,18 @@ class Car:
         self.steering_angle_velocity = get_deadband(self.steering_angle_velocity, 0.01)
         self.steering_angle += self.steering_angle_velocity * delta_time
         self.steering_angle = clamp(self.steering_angle, -math.pi / 4, math.pi / 4)
-        self.steering_angle = get_deadband(self.steering_angle, 0.01)
+        self.steering_angle = get_deadband(self.steering_angle, 0.001)
 
         if self.steering_angle != 0:
             turn_radius = self.length / math.tan(self.steering_angle)
-            for wheel, is_steering in zip(self.wheels, self.steering_wheels):
-                wheel.update_physics(delta_time)
-                if is_steering:
+
+        for wheel, is_steering in zip(self.wheels, self.steering_wheels):
+            wheel.update_physics(delta_time)
+            if is_steering:
+                if self.steering_angle != 0:
                     wheel.rotation = math.atan2(self.length, turn_radius + get_x(wheel.position))
+                else:
+                    wheel.rotation = 0
 
         for wheel, is_driving in zip(self.wheels, self.driving_wheels):
             if is_driving:
