@@ -34,7 +34,7 @@ class Car:
         self.steering_angle = 0
         self.steering_angle_velocity = 0
         self.steering_angle_speed = 0.5
-        self.steering_angle_dampen = 4
+        self.steering_angle_dampen = 0.25
 
     def apply_force_at_position(self, force, position, delta_time):
         self.apply_force(force, delta_time)
@@ -57,10 +57,12 @@ class Car:
         elif right_input:
             self.steering_angle_velocity = self.steering_angle_speed * (2 if self.steering_angle < 0 else 1)
         else:
-            self.steering_angle_velocity = -self.steering_angle * self.steering_angle_dampen
+            self.steering_angle_velocity = -self.steering_angle / delta_time * self.steering_angle_dampen
 
+        self.steering_angle_velocity = get_deadband(self.steering_angle_velocity, 0.01)
         self.steering_angle += self.steering_angle_velocity * delta_time
         self.steering_angle = clamp(self.steering_angle, -math.pi / 4, math.pi / 4)
+        self.steering_angle = get_deadband(self.steering_angle, 0.01)
 
         if self.steering_angle != 0:
             turn_radius = self.length / math.tan(self.steering_angle)
