@@ -53,9 +53,9 @@ class Car:
         if left_input and right_input:
             self.steering_angle_velocity = 0
         elif left_input:
-            self.steering_angle_velocity = -self.steering_angle_speed * (2 if self.steering_angle > 0 else 1)
-        elif right_input:
             self.steering_angle_velocity = self.steering_angle_speed * (2 if self.steering_angle < 0 else 1)
+        elif right_input:
+            self.steering_angle_velocity = -self.steering_angle_speed * (2 if self.steering_angle > 0 else 1)
         else:
             self.steering_angle_velocity = -self.steering_angle / delta_time * self.steering_angle_dampen
 
@@ -65,7 +65,7 @@ class Car:
         self.steering_angle = get_deadband(self.steering_angle, 0.001)
 
         if self.steering_angle != 0:
-            turn_radius = self.length / math.tan(self.steering_angle)
+            turn_radius = -self.length / math.tan(self.steering_angle)
 
         for wheel, is_steering in zip(self.wheels, self.steering_wheels):
             wheel.update_physics(delta_time)

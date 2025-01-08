@@ -25,6 +25,7 @@ class Wheel:
         self.power = 0
         self.drive_function = self.default_driving_function if drive_function == None else drive_function
     
+    # Unused
     def get_suspension_force(self, delta_time):
         vertical_force = (self.car.world.ground - (get_z(self.car.position) + get_z(self.position))) * self.spring_strength - abs(get_z(self.car.velocity)) * self.damping_strength
         return np.array([0, 0, vertical_force])
@@ -46,7 +47,9 @@ class Wheel:
             return np.empty(3)
         
         traction = self.traction_function(abs(steering_velocity / np.linalg.norm(global_velocity)))
-        return -steering_velocity * traction / delta_time * steering_direction * self.wheel_friction
+        # removing wheel_friction - it is just traction
+        # removing traction - unecessary complexity, add back later
+        return -steering_velocity / delta_time * self.car.mass / 4 * steering_direction #* self.wheel_friction * traction 
         
     def get_driving_force(self, deltaTime):
         if self.power == 0:
