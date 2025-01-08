@@ -71,7 +71,7 @@ class Car:
             wheel.update_physics(delta_time)
             if is_steering:
                 if self.steering_angle != 0:
-                    wheel.rotation = math.atan2(self.length, turn_radius + get_x(wheel.position))
+                    wheel.rotation = math.atan(self.length / (turn_radius - get_x(wheel.position)))
                 else:
                     wheel.rotation = 0
 
