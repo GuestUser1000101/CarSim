@@ -7,7 +7,7 @@ class World:
         self.car = Car(self, 2, 4, 1000, 10000)
         self.ground = 0
         self.gravity = 9.81
-        self.pixels_per_meter = 20
+        self.pixels_per_meter = 3
 
     def update_world_physics(self, delta_time, inputs):
         for i in range(4):

@@ -38,7 +38,7 @@ class Car:
 
     def apply_force_at_position(self, force, position, delta_time):
         self.apply_force(force, delta_time)
-        torque = np.linalg.norm(force) * np.linalg.norm(position) * math.sin(get_signed_angle_between(force, -position))
+        torque = np.linalg.norm(force) * np.linalg.norm(position) * math.sin(get_signed_angle_between(-position, force))
         self.rotational_velocity += torque / self.rotational_inertia * delta_time
 
     def apply_force(self, force, delta_time):
@@ -65,7 +65,7 @@ class Car:
         self.steering_angle = get_deadband(self.steering_angle, 0.001)
 
         if self.steering_angle != 0:
-            turn_radius = -self.length / math.tan(self.steering_angle)
+            turn_radius = self.length / math.tan(self.steering_angle)
 
         for wheel, is_steering in zip(self.wheels, self.steering_wheels):
             wheel.update_physics(delta_time)
@@ -85,8 +85,10 @@ class Car:
     
     def draw(self, screen):
         draw_rect(screen, (255, 0, 0), self.position, self.length, self.width, self.rotation, self.world.pixels_per_meter)
+        draw_vector(screen, (0, 255, 0), self.position, self.velocity, 2, 0.1, self.world.pixels_per_meter)
         for wheel in self.wheels:
             draw_rect(screen, (0, 255, 255), self.position + rotate_vector(wheel.position, self.rotation), 1, 0.4, self.rotation + wheel.rotation, self.world.pixels_per_meter)
+            draw_vector(screen, (255, 255, 255), self.position + rotate_vector(wheel.position, self.rotation), rotate_vector(wheel.steering_direction, self.rotation), 1, 1, self.world.pixels_per_meter)
     
     def draw_steering(self, screen, screen_x, screen_y):
         draw_rect(screen, (255, 255, 255), np.array([screen_x, screen_y]), 60, 75, self.steering_angle)

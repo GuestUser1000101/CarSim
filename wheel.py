@@ -12,7 +12,7 @@ class Wheel:
         self.velocity = np.array((0.0, 0.0, 0.0))
         self.rotation = 0
         self.mass = mass
-
+        
         # Suspension
         self.spring_strength = spring_strength
         self.damping_strength = damping_strength
@@ -20,6 +20,8 @@ class Wheel:
         # Traction
         self.traction_function = self.default_traction_function if traction_function == None else traction_function
         self.wheel_friction = 100
+        self.steering_force = np.array((0.0, 0.0, 0.0))
+        self.steering_direction = np.array((0.0, 0.0, 0.0))
 
         # Drive
         self.power = 0
@@ -31,11 +33,13 @@ class Wheel:
         return np.array([0, 0, vertical_force])
     
     def get_steering_force(self, delta_time):
-        steering_direction = np.array([math.cos(self.rotation), math.sin(self.rotation), 0])
+        steering_direction = np.array([math.cos(-self.rotation), math.sin(-self.rotation), 0])
+        self.steering_direction = steering_direction
+
         global_velocity = (
             rotate_vector(
                 self.car.rotational_velocity * self.position,
-                -math.pi / 2
+                math.pi / 2
             ) +
             rotate_vector(self.car.velocity, -self.car.rotation) +
             self.velocity
@@ -49,7 +53,8 @@ class Wheel:
         traction = self.traction_function(abs(steering_velocity / np.linalg.norm(global_velocity)))
         # removing wheel_friction - it is just traction
         # removing traction - unecessary complexity, add back later
-        return -steering_velocity / delta_time * self.car.mass / 4 * steering_direction #* self.wheel_friction * traction 
+        self.steering_force = -steering_velocity / delta_time * self.car.mass / 4 * steering_direction #* self.wheel_friction * traction
+        return self.steering_force
         
     def get_driving_force(self, deltaTime):
         if self.power == 0:

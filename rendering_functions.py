@@ -12,6 +12,9 @@ def draw_rect(screen, color, position, length, width, rot, pixels_per_meter = 1)
     for angle in angles:
         rel_y = -radius * math.sin(angle + rot)
         rel_x = radius * math.cos(angle + rot)
-        points.append(((get_x(position) + rel_x) * pixels_per_meter, screen.get_size()[1] - (get_y(position) + rel_y) * pixels_per_meter))
+        points.append(((get_x(position) + rel_x) * pixels_per_meter, (get_y(position) + rel_y) * pixels_per_meter))
 
     pg.draw.polygon(screen, color, points)
+
+def draw_vector(screen, color, position, vector, weight = 1, vector_scale = 1, pixels_per_meter = 1):
+    pg.draw.line(screen, color, (position * pixels_per_meter).tolist()[:2], ((position + vector * vector_scale) * pixels_per_meter).tolist()[:2], weight)
