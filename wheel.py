@@ -12,7 +12,7 @@ class Wheel:
         self.velocity = np.array((0.0, 0.0, 0.0))
         self.rotation = 0
         self.mass = mass
-        
+
         # Suspension
         self.spring_strength = spring_strength
         self.damping_strength = damping_strength
@@ -21,11 +21,11 @@ class Wheel:
         self.traction_function = self.default_traction_function if traction_function == None else traction_function
         self.wheel_friction = 100
         self.steering_force = np.array((0.0, 0.0, 0.0))
-        self.steering_direction = np.array((0.0, 0.0, 0.0))
 
         # Drive
         self.power = 0
         self.drive_function = self.default_driving_function if drive_function == None else drive_function
+        self.driving_force = np.array((0.0, 0.0, 0.0))
     
     # Unused
     def get_suspension_force(self, delta_time):
@@ -63,7 +63,10 @@ class Wheel:
         driving_direction = np.array([abs(math.cos(self.rotation + math.pi / 2)), abs(math.sin(self.rotation + math.pi / 2)), 0])
         
         driving_velocity_percent = clamp(abs(np.dot(rotate_vector(self.car.velocity, -self.car.rotation), driving_direction) / self.car.max_speed), 0, 1)
-        return driving_direction * self.drive_function(driving_velocity_percent) * self.power
+
+        self.driving_force = driving_direction * self.power # * self.drive_function(driving_velocity_percent)
+
+        return self.driving_force
 
     def default_traction_function(self, percent_steering_velocity):
         if percent_steering_velocity < 0 or percent_steering_velocity > 1:

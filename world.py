@@ -8,6 +8,7 @@ class World:
         self.ground = 0
         self.gravity = 9.81
         self.pixels_per_meter = 3
+        self.debug = True
 
     def update_world_physics(self, delta_time, inputs):
         for i in range(4):

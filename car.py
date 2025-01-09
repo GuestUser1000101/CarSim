@@ -85,10 +85,13 @@ class Car:
     
     def draw(self, screen):
         draw_rect(screen, (255, 0, 0), self.position, self.length, self.width, self.rotation, self.world.pixels_per_meter)
-        draw_vector(screen, (0, 255, 0), self.position, self.velocity, 2, 0.1, self.world.pixels_per_meter)
+        if self.world.debug:
+            draw_vector(screen, (0, 255, 0), self.position, self.velocity, 2, 0.1, self.world.pixels_per_meter)
         for wheel in self.wheels:
             draw_rect(screen, (0, 255, 255), self.position + rotate_vector(wheel.position, self.rotation), 1, 0.4, self.rotation + wheel.rotation, self.world.pixels_per_meter)
-            draw_vector(screen, (255, 255, 255), self.position + rotate_vector(wheel.position, self.rotation), rotate_vector(wheel.steering_direction, self.rotation), 1, 1, self.world.pixels_per_meter)
+            if self.world.debug:
+                draw_vector(screen, (255, 255, 0), self.position + rotate_vector(wheel.position, self.rotation), rotate_vector(wheel.steering_force, self.rotation), 1, 0.01, self.world.pixels_per_meter)
+                draw_vector(screen, (255, 0, 255), self.position + rotate_vector(wheel.position, self.rotation), rotate_vector(wheel.driving_force, self.rotation), 1, 0.01, self.world.pixels_per_meter)
     
     def draw_steering(self, screen, screen_x, screen_y):
         draw_rect(screen, (255, 255, 255), np.array([screen_x, screen_y]), 60, 75, self.steering_angle)
