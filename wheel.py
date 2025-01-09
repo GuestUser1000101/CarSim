@@ -53,7 +53,7 @@ class Wheel:
         traction = self.traction_function(abs(steering_velocity / np.linalg.norm(global_velocity)))
         # removing wheel_friction - it is just traction
         # removing traction - unecessary complexity, add back later
-        self.steering_force = -steering_velocity / delta_time * self.car.mass / 4 * steering_direction #* self.wheel_friction * traction
+        self.steering_force = -steering_velocity / delta_time * self.car.mass / 4 * steering_direction * 0.8 #* self.wheel_friction * traction
         return self.steering_force
         
     def get_driving_force(self, deltaTime):

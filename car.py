@@ -8,18 +8,24 @@ import pygame as pg
 
 class Car:
     def __init__(self, world, width, length, mass, drive_power, driving_wheels = (1, 1, 0, 0), steering_wheels = (1, 1, 0, 0)):
-        self.velocity = np.array((0.0, 0.0, 0.0))
+        # Kinematics
         self.position = np.array((0.0, 0.0, 0.0))
+        self.velocity = np.array((0.0, 0.0, 0.0))
+        self.max_speed = 50 # Unused
         self.rotation = 0
         self.rotational_velocity = 0
+
+        # Environment
         self.world = world
-        self.max_speed = 50
+
+        # Constants
         self.width = width
         self.length = length
         self.drive_power = drive_power
         self.mass = mass
         self.rotational_inertia = 2 / 5 * self.mass * math.pow((self.width + self.length) / 2, 2)
-        # front_left, front_right, back_left, back_right
+
+        # Wheels (front_left, front_right, back_left, back_right)
         self.driving_wheels = driving_wheels
         self.steering_wheels = steering_wheels
         self.wheels = [
@@ -29,7 +35,7 @@ class Car:
             Wheel(self, np.array([self.width / 2, -self.length / 2, -0.5]), 100, 100, 10)
         ]
 
-        # fowards, left, right, backward
+        # Inputs (fowards, left, right, backward)
         self.inputs = [False, False, False, False]
         self.steering_angle = 0
         self.steering_angle_velocity = 0
