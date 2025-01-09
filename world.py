@@ -15,7 +15,7 @@ class World:
         self.debug = True
 
         # Road
-        self.road = load_road_from_file('paths\\circle.txt')
+        self.road = load_road_from_file('paths\\racetrack.txt')
 
         # The car
         self.car = Car(self, 2, 4, 1000, 3000)
