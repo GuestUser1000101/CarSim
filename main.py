@@ -6,6 +6,8 @@ from car import *
 from wheel import *
 
 pg.init()
+pg.font.init()
+font = pg.font.SysFont('Comic Sans MS', 10)
 SCREEN_WIDTH, SCREEN_HEIGHT = 500, 500
 DISPLAY = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -19,6 +21,9 @@ while True:
         if event.type == pg.QUIT:
             pg.quit()
             sys.exit()
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_TAB:
+                world.debug = not world.debug
 
     pg.display.update()
     delta_time = clock.tick(FPS) / 1000
@@ -32,5 +37,5 @@ while True:
             keys[pg.K_DOWN] or keys[pg.K_s]
         )
     )
-    world.update_world_graphics(DISPLAY)
+    world.update_world_graphics(DISPLAY, font)
     #print(world.car.velocity)

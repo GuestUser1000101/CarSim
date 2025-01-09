@@ -38,3 +38,6 @@ def get_unit(vector):
 
 def rotate_vector(vector, angle):
     return np.dot(vector, np.array([[math.cos(angle), -math.sin(angle), 0], [math.sin(angle),  math.cos(angle), 0], [0, 0, 1]]))
+
+def get_distance(pos1, pos2):
+    return math.sqrt(math.pow(pos2[0] - pos1[0], 2) + math.pow(pos2[1] - pos1[1], 2))

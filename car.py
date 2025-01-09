@@ -8,15 +8,21 @@ import pygame as pg
 
 class Car:
     def __init__(self, world, width, length, mass, drive_power, driving_wheels = (1, 1, 0, 0), steering_wheels = (1, 1, 0, 0)):
-        # Kinematics
-        self.position = np.array((0.0, 0.0, 0.0))
-        self.velocity = np.array((0.0, 0.0, 0.0))
-        self.max_speed = 50 # Unused
-        self.rotation = 0
-        self.rotational_velocity = 0
-
         # Environment
         self.world = world
+        self.current_segment = 0
+        self.is_on_road = True
+        self.distance_to_road = 0
+
+        # Kinematics
+        self.position = np.array((self.world.road[0][0], self.world.road[0][1], 0.0))
+        self.velocity = np.array((0.0, 0.0, 0.0))
+        self.max_speed = 50 # Unused
+        self.rotation = math.atan2(
+            self.world.road[1][0] - self.world.road[0][0],
+            self.world.road[1][1] - self.world.road[0][1]
+            )
+        self.rotational_velocity = 0
 
         # Constants
         self.width = width
@@ -93,11 +99,13 @@ class Car:
         draw_rect(screen, (255, 0, 0), self.position, self.length, self.width, self.rotation, self.world.pixels_per_meter)
         if self.world.debug:
             draw_vector(screen, (0, 255, 0), self.position, self.velocity, 2, 0.1, self.world.pixels_per_meter)
+            draw_rect(screen, (255, 0, 0), np.array((40, 60, 0)), self.length * 20, self.width * 20, 0, 1)
         for wheel in self.wheels:
             draw_rect(screen, (0, 255, 255), self.position + rotate_vector(wheel.position, self.rotation), 1, 0.4, self.rotation + wheel.rotation, self.world.pixels_per_meter)
             if self.world.debug:
                 draw_vector(screen, (255, 255, 0), self.position + rotate_vector(wheel.position, self.rotation), rotate_vector(wheel.steering_force, self.rotation), 1, 0.01, self.world.pixels_per_meter)
                 draw_vector(screen, (255, 0, 255), self.position + rotate_vector(wheel.position, self.rotation), rotate_vector(wheel.driving_force, self.rotation), 1, 0.01, self.world.pixels_per_meter)
+                draw_rect(screen, (0, 255, 255), np.array((40, 60, 0)) + rotate_vector(wheel.position, math.pi) * 20, 20, 8, wheel.rotation, 1)
     
     def draw_steering(self, screen, screen_x, screen_y):
         draw_rect(screen, (255, 255, 255), np.array([screen_x, screen_y]), 60, 75, self.steering_angle)
