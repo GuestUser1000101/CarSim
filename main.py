@@ -94,11 +94,13 @@ class QTrainer:
 class Agent:
     def __init__(self):
         self.game_count = 0
-        self.epsilon = 0 # Randomness
+        self.epsilon = 2 # Randomness
         self.gamma = 0.9 # Discount rate, < 1
         self.memory = deque(maxlen = MAX_MEMORY) # popleft() when memory is exceeded
-        self.model = Linear_QNet(5, 256, 4) # TODO
-        self.trainer = QTrainer(self.model, lr=LEARNING_RATE, gamma=self.gamma) # TODO
+        self.model = Linear_QNet(5, 256, 4)
+        self.trainer = QTrainer(self.model, lr=LEARNING_RATE, gamma=self.gamma)
+
+        self.model.load_state_dict(torch.load("model/best_model.pth"))
 
     def get_state(self, game):
         return [
@@ -126,7 +128,7 @@ class Agent:
 
     def get_action(self, state):
         # Random moves: Tradeoff in exploration (random) vs exploitation (model)
-        self.epsilon = 80 - self.game_count
+        self.epsilon = max(80 - self.game_count, 1)
         final_move = [0, 0, 0, 0]
 
         if random.randint(0, 200) < self.epsilon:

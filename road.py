@@ -21,13 +21,20 @@ def render_road(screen, road, current_segment, pixels_per_meter):
     draw_loop(screen, (100, 100, 100), road, 10, current_segment, pixels_per_meter)
 
 def distance_to_road(position, road, current_segment):
+    import math
+
+    def get_distance(point1, point2):
+        return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
+
     startpoint = road[current_segment]
     endpoint = road[(current_segment + 1) % len(road)]
     
-    return (
-        abs(
-            (endpoint[0] - startpoint[0]) * (position[1] - startpoint[1])
-            - (endpoint[1] - startpoint[1]) * (position[0] - startpoint[0])
-        )
-        / get_distance(startpoint, endpoint)
-    )
+    line_vec = (endpoint[0] - startpoint[0], endpoint[1] - startpoint[1])
+    point_vec = (position[0] - startpoint[0], position[1] - startpoint[1])
+    
+    line_length_squared = line_vec[0]**2 + line_vec[1]**2
+    t = max(0, min(1, (point_vec[0] * line_vec[0] + point_vec[1] * line_vec[1]) / line_length_squared))
+    
+    closest_point = (startpoint[0] + t * line_vec[0], startpoint[1] + t * line_vec[1])
+    
+    return get_distance(position, closest_point)
