@@ -4,6 +4,7 @@ import sys
 from world import *
 from car import *
 from wheel import *
+import torch
 
 pg.init()
 pg.font.init()
@@ -24,9 +25,11 @@ while True:
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_TAB:
                 world.debug = not world.debug
+            if event.key == pg.K_r:
+                world.reset()
 
-    pg.display.update()
     delta_time = clock.tick(FPS) / 1000
+    
 
     world.update_world_physics(
         delta_time,
@@ -38,4 +41,5 @@ while True:
         )
     )
     world.update_world_graphics(DISPLAY, font)
-    #print(world.car.velocity)
+
+    pg.display.update()

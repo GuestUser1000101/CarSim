@@ -12,7 +12,7 @@ class World:
 
         # Rendering
         self.pixels_per_meter = 3
-        self.debug = True
+        self.debug = False
 
         # Road
         self.road = load_road_from_file('paths\\racetrack.txt')
@@ -21,14 +21,25 @@ class World:
         self.car = Car(self, 2, 4, 1000, 3000)
 
     def update_world_physics(self, delta_time, inputs):
+        reward = 0
+
         for i in range(4):
             self.car.inputs[i] = inputs[i]
         self.car.update_physics(delta_time)
         if 4 > get_distance(self.car.position.tolist()[:2], self.road[(self.car.current_segment + 1) % len(self.road)]):
             self.car.current_segment = (self.car.current_segment + 1) % len(self.road)
+            self.car.cumulative_segment += 1
+            self.car.idle_time = 0
+            reward = 10
         
         self.car.distance_to_road = distance_to_road(self.car.position, self.road, self.car.current_segment)
         self.car.is_on_road = self.car.distance_to_road < 5
+
+        if not self.car.is_on_road or self.car.idle_time > 10:
+            reward = -10
+            return reward, True, self.car.current_segment
+
+        return reward, False, self.car.current_segment
 
     def update_world_graphics(self, screen, font):
         screen.fill((0, 0, 0))
@@ -38,4 +49,6 @@ class World:
         
         if self.debug:
             draw_text(screen, font, (0, 255, 0) if self.car.is_on_road else (255, 0, 0), (10, 480), str(self.car.distance_to_road))
-        
+
+    def reset(self):
+        self.car = Car(self, 2, 4, 1000, 3000)

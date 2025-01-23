@@ -11,6 +11,8 @@ class Car:
         # Environment
         self.world = world
         self.current_segment = 0
+        self.cumulative_segment = 0
+        self.idle_time = 0
         self.is_on_road = True
         self.distance_to_road = 0
 
@@ -94,6 +96,7 @@ class Car:
         
         self.rotation += self.rotational_velocity * delta_time
         self.position += self.velocity * delta_time
+        self.idle_time += delta_time
     
     def draw(self, screen):
         draw_rect(screen, (255, 0, 0), self.position, self.length, self.width, self.rotation, self.world.pixels_per_meter)
