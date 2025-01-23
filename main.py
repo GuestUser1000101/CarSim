@@ -30,6 +30,8 @@ MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LEARNING_RATE = 0.001
 TRAINING_DELTA_TIME = 0.05
+SAVE_MODEL = False
+ONLY_EXPLOIT = True
 
 class Linear_QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
@@ -94,7 +96,7 @@ class QTrainer:
 class Agent:
     def __init__(self):
         self.game_count = 0
-        self.epsilon = 2 # Randomness
+        self.epsilon = 0 # Randomness
         self.gamma = 0.9 # Discount rate, < 1
         self.memory = deque(maxlen = MAX_MEMORY) # popleft() when memory is exceeded
         self.model = Linear_QNet(5, 256, 4)
@@ -128,7 +130,7 @@ class Agent:
 
     def get_action(self, state):
         # Random moves: Tradeoff in exploration (random) vs exploitation (model)
-        self.epsilon = max(80 - self.game_count, 1)
+        self.epsilon = max(80 - self.game_count, 1) if not ONLY_EXPLOIT else 0
         final_move = [0, 0, 0, 0]
 
         if random.randint(0, 200) < self.epsilon:
@@ -172,7 +174,8 @@ def train():
 
             if score > record:
                 record = score
-                agent.model.save()
+                if SAVE_MODEL:
+                    agent.model.save()
 
             print(f'Game {agent.game_count}, Score {score}, Record {record}')
             
