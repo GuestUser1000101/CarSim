@@ -26,7 +26,12 @@ class World:
         for i in range(4):
             self.car.inputs[i] = inputs[i]
         self.car.update_physics(delta_time)
-        if 4 > get_distance(self.car.position.tolist()[:2], self.road[(self.car.current_segment + 1) % len(self.road)]):
+        self.car.distance_to_next_segment = get_distance(self.car.position.tolist()[:2], self.road[(self.car.current_segment + 1) % len(self.road)])
+        self.car.angle_to_next_segment = get_bound_angle(
+            -get_angle_of_line(self.car.position, self.road[(self.car.current_segment + 1) % len(self.road)]) + math.pi / 2
+            - self.car.rotation
+        )
+        if self.car.distance_to_next_segment < 5:
             self.car.current_segment = (self.car.current_segment + 1) % len(self.road)
             self.car.cumulative_segment += 1
             self.car.idle_time = 0
@@ -35,7 +40,7 @@ class World:
         self.car.distance_to_road = distance_to_road(self.car.position, self.road, self.car.current_segment)
         self.car.is_on_road = self.car.distance_to_road < 5
 
-        if not self.car.is_on_road or self.car.idle_time > 10:
+        if not self.car.is_on_road or self.car.idle_time > 30:
             reward = -10
             return reward, True, self.car.current_segment
 
@@ -51,4 +56,4 @@ class World:
             draw_text(screen, font, (0, 255, 0) if self.car.is_on_road else (255, 0, 0), (10, 480), str(self.car.distance_to_road))
 
     def reset(self):
-        self.car = Car(self, 2, 4, 1000, 3000)
+        self.car.reset()

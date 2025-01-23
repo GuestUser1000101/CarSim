@@ -15,6 +15,8 @@ class Car:
         self.idle_time = 0
         self.is_on_road = True
         self.distance_to_road = 0
+        self.angle_to_next_segment = 0
+        self.distance_to_next_segment = 0
 
         # Kinematics
         self.position = np.array((self.world.road[0][0], self.world.road[0][1], 0.0))
@@ -49,6 +51,34 @@ class Car:
         self.steering_angle_velocity = 0
         self.steering_angle_speed = 0.5
         self.steering_angle_dampen = 0.25
+
+    def reset(self):
+        # Environment
+        self.current_segment = 0
+        self.cumulative_segment = 0
+        self.idle_time = 0
+        self.is_on_road = True
+        self.distance_to_road = 0
+        self.angle_to_next_segment = 0
+        self.distance_to_next_segment = 0
+
+        # Kinematics
+        self.position = np.array((self.world.road[0][0], self.world.road[0][1], 0.0))
+        self.velocity = np.array((0.0, 0.0, 0.0))
+        self.rotation = math.atan2(
+            self.world.road[1][0] - self.world.road[0][0],
+            self.world.road[1][1] - self.world.road[0][1]
+            )
+        self.rotational_velocity = 0
+
+        # Wheels
+        for wheel in self.wheels:
+            wheel.reset()
+
+        # Inputs (fowards, left, right, backward)
+        self.inputs = [False, False, False, False]
+        self.steering_angle = 0
+        self.steering_angle_velocity = 0
 
     def apply_force_at_position(self, force, position, delta_time):
         self.apply_force(force, delta_time)
@@ -95,6 +125,7 @@ class Car:
             wheel.apply_forces_to_car(delta_time)
         
         self.rotation += self.rotational_velocity * delta_time
+        self.rotation = get_bound_angle(self.rotation)
         self.position += self.velocity * delta_time
         self.idle_time += delta_time
     

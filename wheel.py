@@ -27,6 +27,10 @@ class Wheel:
         self.drive_function = self.default_driving_function if drive_function == None else drive_function
         self.driving_force = np.array((0.0, 0.0, 0.0))
     
+    def reset(self):
+        self.velocity = np.array((0.0, 0.0, 0.0))
+        self.rotation = 0
+
     # Unused
     def get_suspension_force(self, delta_time):
         vertical_force = (self.car.world.ground - (get_z(self.car.position) + get_z(self.position))) * self.spring_strength - abs(get_z(self.car.velocity)) * self.damping_strength

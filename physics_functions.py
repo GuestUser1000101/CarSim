@@ -41,3 +41,13 @@ def rotate_vector(vector, angle):
 
 def get_distance(pos1, pos2):
     return math.sqrt(math.pow(pos2[0] - pos1[0], 2) + math.pow(pos2[1] - pos1[1], 2))
+
+def get_angle_of_line(origin, end):
+    return math.atan2(get_y(end) - get_y(origin), get_x(end) - get_x(origin))
+    
+def get_bound_angle(angle):
+    if angle > math.pi:
+        return get_bound_angle(angle - 2 * math.pi)
+    elif angle < -math.pi:
+        return get_bound_angle(angle + 2 * math.pi)
+    return angle
