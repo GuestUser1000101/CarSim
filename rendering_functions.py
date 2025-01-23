@@ -4,7 +4,9 @@ from physics_functions import *
 import matplotlib.pyplot as plt
 from IPython import display
 
-plt.ion()
+# Initialize the figure and axes once
+plt.ion()  # Enable interactive mode
+fig, ax = plt.subplots()
 
 def draw_rect(screen, color, position, length, width, rot, pixels_per_meter = 1):
     points = []
@@ -43,7 +45,7 @@ def draw_loop(screen, color, points, weight = 10, highlight_segment = -1, pixels
 def draw_text(screen, font, color, position, text):
     surface = font.render(text, False, color)
     screen.blit(surface, position)
-
+'''
 def plot(scores, mean_scores):
     display.clear_output(wait = True)
     display.display(plt.gcf())
@@ -56,3 +58,30 @@ def plot(scores, mean_scores):
     plt.ylim(ymin = 0)
     plt.text(len(scores) - 1, scores[-1], str(scores[-1]))
     plt.text(len(mean_scores) - 1, mean_scores[-1], str(mean_scores[-1]))
+'''
+
+def plot(scores, mean_scores):
+    # Clear the axes for the new data
+    ax.clear()
+    
+    # Plot the scores and mean_scores
+    ax.plot(scores, label='Scores', color='blue')
+    ax.plot(mean_scores, label='Mean Scores', color='orange')
+    
+    # Add titles, labels, and legends
+    ax.set_title('Training Progress')
+    ax.set_xlabel('Number of Cycles')
+    ax.set_ylabel('Segments Traversed')
+    ax.legend()
+    ax.set_ylim(ymin=0)  # Ensure the y-axis starts at 0
+    
+    # Annotate the latest points
+    if scores:
+        ax.text(len(scores) - 1, scores[-1], f'{scores[-1]:.2f}', color='blue')
+    if mean_scores:
+        ax.text(len(mean_scores) - 1, mean_scores[-1], f'{mean_scores[-1]:.2f}', color='orange')
+    
+    # Update the plot
+    fig.canvas.draw()
+    fig.canvas.flush_events()
+    plt.pause(0.1)  # Pause to allow the update to render

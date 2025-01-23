@@ -21,7 +21,7 @@ pg.font.init()
 font = pg.font.SysFont('Comic Sans MS', 10)
 SCREEN_WIDTH, SCREEN_HEIGHT = 500, 500
 DISPLAY = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-FPS = 60
+FPS = 100
 clock = pg.time.Clock()
 world = World()
 
@@ -29,6 +29,7 @@ world = World()
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LEARNING_RATE = 0.001
+TRAINING_DELTA_TIME = 0.05
 
 class Linear_QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
@@ -152,7 +153,7 @@ def train():
         final_move = agent.get_action(state_old)
 
         # Perrform move and get new state
-        reward, done, score = game_loop(0.02, final_move)
+        reward, done, score = game_loop(TRAINING_DELTA_TIME, final_move)
         state_new = agent.get_state(world)
 
         # Train short memory
@@ -177,9 +178,6 @@ def train():
             total_score += score
             mean_score = total_score / agent.game_count
             plot_mean_scores.append(mean_score)
-
-            print(plot_scores)
-            print(plot_mean_scores)
 
             plot(plot_scores, plot_mean_scores)
 
